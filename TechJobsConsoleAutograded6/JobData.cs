@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace TechJobsConsoleAutograded6
 {
-	public class JobData
-	{
+    public class JobData
+    {
         static List<Dictionary<string, string>> AllJobs = new List<Dictionary<string, string>>();
         static bool IsDataLoaded = false;
 
@@ -14,10 +16,6 @@ namespace TechJobsConsoleAutograded6
             return AllJobs;
         }
 
-        /*
-         * Returns a list of all values contained in a given column,
-         * without duplicates. 
-         */
         public static List<string> FindAll(string column)
         {
             LoadData();
@@ -37,54 +35,63 @@ namespace TechJobsConsoleAutograded6
             return values;
         }
 
-        /**
-         * Search all columns for the given term
-         */
-
-        //TODO: Complete the FindByValue method
         public static List<Dictionary<string, string>> FindByValue(string value)
         {
-            // load data, if not already loaded
             LoadData();
 
-            return null;
+            List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
+            HashSet<Dictionary<string, string>> uniqueJobs = new HashSet<Dictionary<string, string>>();
+
+            if (value == null)
+            {
+                return jobs;
+            }
+
+            foreach (Dictionary<string, string> row in AllJobs)
+            {
+                foreach (KeyValuePair<string, string> field in row)
+                {
+                    if (field.Value != null && field.Value.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        uniqueJobs.Add(row);
+                        break;
+                    }
+                }
+            }
+
+            jobs.AddRange(uniqueJobs);
+            return jobs;
         }
 
-        /**
-         * Returns results of search the jobs data by key/value, using
-         * inclusion of the search term.
-         *
-         * For example, searching for employer "Enterprise" will include results
-         * with "Enterprise Holdings, Inc".
-         */
         public static List<Dictionary<string, string>> FindByColumnAndValue(string column, string value)
         {
-            // load data, if not already loaded
             LoadData();
 
             List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
 
+            if (column == null || value == null)
+            {
+                return jobs;
+            }
+
             foreach (Dictionary<string, string> row in AllJobs)
             {
-                string aValue = row[column];
-
-
-                //TODO: Make search case-insensitive
-                if (aValue.Contains(value))
+                if (row.ContainsKey(column))
                 {
-                    jobs.Add(row);
+                    string aValue = row[column];
+
+                    if (aValue != null && aValue.IndexOf(value, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        jobs.Add(row);
+                    }
                 }
             }
 
             return jobs;
         }
 
-        /*
-         * Load and parse data from job_data.csv
-         */
         private static void LoadData()
         {
-
             if (IsDataLoaded)
             {
                 return;
@@ -108,7 +115,6 @@ namespace TechJobsConsoleAutograded6
             string[] headers = rows[0];
             rows.Remove(headers);
 
-            // Parse each row array into a more friendly Dictionary
             foreach (string[] row in rows)
             {
                 Dictionary<string, string> rowDict = new Dictionary<string, string>();
@@ -123,19 +129,15 @@ namespace TechJobsConsoleAutograded6
             IsDataLoaded = true;
         }
 
-        /*
-         * Parse a single line of a CSV file into a string array
-         */
         private static string[] CSVRowToStringArray(string row, char fieldSeparator = ',', char stringSeparator = '\"')
         {
             bool isBetweenQuotes = false;
             StringBuilder valueBuilder = new StringBuilder();
             List<string> rowValues = new List<string>();
 
-            // Loop through the row string one char at a time
             foreach (char c in row.ToCharArray())
             {
-                if ((c == fieldSeparator && !isBetweenQuotes))
+                if (c == fieldSeparator && !isBetweenQuotes)
                 {
                     rowValues.Add(valueBuilder.ToString());
                     valueBuilder.Clear();
@@ -153,7 +155,6 @@ namespace TechJobsConsoleAutograded6
                 }
             }
 
-            // Add the final value
             rowValues.Add(valueBuilder.ToString());
             valueBuilder.Clear();
 
@@ -161,4 +162,3 @@ namespace TechJobsConsoleAutograded6
         }
     }
 }
-

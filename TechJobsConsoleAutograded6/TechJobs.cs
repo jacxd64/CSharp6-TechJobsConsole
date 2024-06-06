@@ -1,19 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TechJobsConsoleAutograded6
 {
-	public class TechJobs
-	{
+    public class TechJobs
+    {
         public void RunProgram()
         {
-            // Create two Dictionary vars to hold info for menu and data
-
-            // Top-level menu options
             Dictionary<string, string> actionChoices = new Dictionary<string, string>();
             actionChoices.Add("search", "Search");
             actionChoices.Add("list", "List");
 
-            // Column options
             Dictionary<string, string> columnChoices = new Dictionary<string, string>();
             columnChoices.Add("core competency", "Skill");
             columnChoices.Add("employer", "Employer");
@@ -23,10 +20,8 @@ namespace TechJobsConsoleAutograded6
 
             Console.WriteLine("Welcome to LaunchCode's TechJobs App!");
 
-            // Allow user to search/list until they manually quit with ctrl+c
             while (true)
             {
-
                 string actionChoice = GetUserSelection("View Jobs", actionChoices);
 
                 if (actionChoice == null)
@@ -52,19 +47,18 @@ namespace TechJobsConsoleAutograded6
                         }
                     }
                 }
-                else // choice is "search"
+                else
                 {
-                    // How does the user want to search (e.g. by skill or employer)
                     string columnChoice = GetUserSelection("Search", columnChoices);
 
-                    // What is their search term?
                     Console.WriteLine(Environment.NewLine + "Search term: ");
                     string searchTerm = Console.ReadLine();
+                    Console.WriteLine();
 
-                    // Fetch results
                     if (columnChoice.Equals("all"))
                     {
-                        Console.WriteLine("Search all fields not yet implemented.");
+                        List<Dictionary<string, string>> searchResults = JobData.FindByValue(searchTerm);
+                        PrintJobs(searchResults);
                     }
                     else
                     {
@@ -72,13 +66,9 @@ namespace TechJobsConsoleAutograded6
                         PrintJobs(searchResults);
                     }
                 }
-
             }
         }
 
-        /*
-         * Returns the key of the selected item from the choices Dictionary
-         */
         public string GetUserSelection(string choiceHeader, Dictionary<string, string> choices)
         {
             int choiceIdx;
@@ -132,11 +122,29 @@ namespace TechJobsConsoleAutograded6
             return choiceKeys[choiceIdx];
         }
 
-        // TODO: complete the PrintJobs method.
         public void PrintJobs(List<Dictionary<string, string>> someJobs)
         {
-            Console.WriteLine("PrintJobs is not implemented yet");
+            if (someJobs.Count == 0)
+            {
+                Console.WriteLine("No results");
+            }
+            else
+            {
+                for (int i = 0; i < someJobs.Count; i++)
+                {
+                    var job = someJobs[i];
+                    Console.WriteLine("*****");
+                    foreach (KeyValuePair<string, string> field in job)
+                    {
+                        Console.WriteLine($"{field.Key}: {field.Value}");
+                    }
+                    Console.WriteLine("*****");
+                    if (i < someJobs.Count - 1)
+                    {
+                        Console.WriteLine();
+                    }
+                }
+            }
         }
     }
 }
-
